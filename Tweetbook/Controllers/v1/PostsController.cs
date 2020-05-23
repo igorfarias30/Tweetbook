@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using Tweetbook.Contracts.v1.Requests;
+using Tweetbook.Contracts.v1.Response;
 using Tweetbook.Domain;
 using static Tweetbook.Contracts.v1.ApiRoutes;
 
@@ -29,15 +29,19 @@ namespace Tweetbook.Controllers.v1
         [HttpPost(Posts.Create)]
         public IActionResult Create([FromBody] CreatePostRequest request)
         {
-            if (post?.Id != null)
-                var post = new Post(request.Id);
-            _posts.Add(post);
-            else
-                post.Id = Int64.Parse(Guid.NewGuid().ToString());
 
+            if (request?.Id == null)
+            {
+                return BadRequest(new BadRequestResult());
+            }
+
+            var post = new Post(request.Id);
+            _posts.Add(post);
 
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
             var locationUrl = baseUrl + "/" + Posts.Get.Replace("{postId}", post.Id.ToString());
+
+            var response = new PostResponse { Id = post.Id };
             return Created(locationUrl, post);
         }
     }
