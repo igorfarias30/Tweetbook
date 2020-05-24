@@ -1,30 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using Tweetbook.Contracts.v1.Requests;
 using Tweetbook.Contracts.v1.Response;
 using Tweetbook.Domain;
+using Tweetbook.Services;
 using static Tweetbook.Contracts.v1.ApiRoutes;
 
 namespace Tweetbook.Controllers.v1
 {
     public class PostsController : Controller
     {
-        private List<Post> _posts;
+        private readonly IPostService _postService;
 
-        public PostsController()
-        {
-            _posts = new List<Post>();
-            for (long i = 0; i < 10; i++)
-            {
-                _posts.Add(new Post { Id = i });
-            }
-        }
+        public PostsController(IPostService postService)
+            => _postService = postService;
 
         [HttpGet(Posts.GetAll)]
         public IActionResult GetAll()
-        {
-            return Ok(_posts);
-        }
+            => Ok(_postService.GetPosts());
+
+        [HttpGet(Posts.Get)]
+        public IActionResult GetById([FromRoute] long postId)
+            => Ok(_postService.GetPostById(postId));
 
         [HttpPost(Posts.Create)]
         public IActionResult Create([FromBody] CreatePostRequest request)
@@ -35,8 +31,8 @@ namespace Tweetbook.Controllers.v1
                 return BadRequest(new BadRequestResult());
             }
 
-            var post = new Post(request.Id);
-            _posts.Add(post);
+            var post = new Post(request.Id, request.Name);
+            _postService.GetPosts().Add(post);
 
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
             var locationUrl = baseUrl + "/" + Posts.Get.Replace("{postId}", post.Id.ToString());

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Tweetbook.Options;
+using Tweetbook.Services;
 
 namespace Tweetbook
 {
@@ -26,6 +27,8 @@ namespace Tweetbook
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TweetBook API", Version = "v1" });
             });
+
+            services.AddSingleton<IPostService, PostService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
