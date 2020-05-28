@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Tweetbook.Data;
 using Tweetbook.Options;
 using Tweetbook.Services;
 
@@ -28,11 +30,18 @@ namespace Tweetbook
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TweetBook API", Version = "v1" });
             });
 
-            services.AddSingleton<IPostService, PostService>();
+            services.AddDbContext<DataContext>(options =>
+            {
+                var defaultConnection = Configuration.GetSection("ConnectionStrings");
+                var connectionString = defaultConnection["DefaultConnection"] ?? "Test";
+                options.UseSqlServer(connectionString);
+            });
+
+            services.AddScoped<IPostService, PostService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext ctx)
         {
             if (env.IsDevelopment())
             {
@@ -43,6 +52,11 @@ namespace Tweetbook
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+            }
+
+            using (ctx)
+            {
+                ctx.Database.EnsureCreated();
             }
 
             var swaggerOptions = new SwaggerDetails();
