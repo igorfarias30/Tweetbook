@@ -7,5 +7,7 @@ namespace Tweetbook.Services
     {
         List<Post> GetPosts();
         Post GetPostById(long Id);
+        bool UpdatePost(Post postToUpdate);
+        bool DeletePost(long postId);
     }
 }
