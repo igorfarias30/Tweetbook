@@ -21,8 +21,8 @@ namespace Tweetbook.Controllers.v1
 
         [HttpGet(Posts.Get)]
         [ProducesResponseType(200, Type = typeof(PostResponse))]
-        public IActionResult GetById([FromRoute] long postId)
-            => Ok(_postService.GetPostById(postId));
+        public IActionResult GetById(GetPostByIdRequest request)
+            => Ok(_postService.GetPostById(request.Id));
 
         [HttpPost(Posts.Create)]
         public IActionResult Create([FromBody] CreatePostRequest request)
