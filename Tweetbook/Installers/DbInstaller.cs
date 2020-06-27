@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tweetbook.Data;
@@ -16,6 +17,8 @@ namespace Tweetbook.Installers
                 var connectionString = defaultConnection["DefaultConnection"] ?? "Test";
                 options.UseSqlServer(connectionString);
             });
+
+            services.AddIdentityCore<IdentityUser>().AddEntityFrameworkStores<DataContext>();
 
             services.AddScoped<IPostService, PostService>();
             //services.AddSingleton<IPostService, CosmosPostService>();
