@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using Tweetbook.Data;
+using Tweetbook.Installers;
 using Tweetbook.Options;
-using Tweetbook.Services;
 
 namespace Tweetbook
 {
@@ -23,21 +21,7 @@ namespace Tweetbook
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "TweetBook API", Version = "v1" });
-            });
-
-            services.AddDbContext<DataContext>(options =>
-            {
-                var defaultConnection = Configuration.GetSection("ConnectionStrings");
-                var connectionString = defaultConnection["DefaultConnection"] ?? "Test";
-                options.UseSqlServer(connectionString);
-            });
-
-            services.AddScoped<IPostService, PostService>();
+            services.InstallServicesInAssembly(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,6 +57,8 @@ namespace Tweetbook
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseRouting();
 
