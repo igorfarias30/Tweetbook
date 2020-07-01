@@ -1,13 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Tweetbook.Contracts.v1.Requests;
 using Tweetbook.Contracts.v1.Response;
 using Tweetbook.Domain;
+using Tweetbook.Extensions;
 using Tweetbook.Services;
 using static Tweetbook.Contracts.v1.ApiRoutes;
 
 namespace Tweetbook.Controllers.v1
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PostsController : Controller
     {
         private readonly IPostService _postService;
@@ -33,7 +37,9 @@ namespace Tweetbook.Controllers.v1
                 return BadRequest(new BadRequestResult());
 
 
-            var post = new Post(request.Name);
+            var post = new Post { Name = request.Name, UserId = HttpContext.GetUserId() };
+
+
             await _postService.CreatePostAsync(post);
 
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
@@ -50,6 +56,11 @@ namespace Tweetbook.Controllers.v1
         [HttpPut(Posts.Update)]
         public async Task<IActionResult> Update(UpdatePostRequest request)
         {
+            var userOwnsPost = await _postService.UserOwnsPostAsync(request.Id, HttpContext.GetUserId());
+
+            if (!userOwnsPost)
+                return BadRequest(new { error = "You do not own this post" });
+
             var post = new Post { Id = request.Id, Name = request.Name };
             var updatedPost = await _postService.UpdatePostAsync(post);
 
@@ -63,6 +74,11 @@ namespace Tweetbook.Controllers.v1
         [ProducesResponseType(200)]
         public async Task<IActionResult> DeletePost([FromRoute] DeletePostRequest request)
         {
+            var userOwnsPost = await _postService.UserOwnsPostAsync(request.Id, HttpContext.GetUserId());
+
+            if (!userOwnsPost)
+                return BadRequest(new { error = "You do not own this post" });
+
             if (request?.Id == null)
                 return BadRequest(new BadRequestResult());
 

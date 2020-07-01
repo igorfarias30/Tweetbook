@@ -60,5 +60,10 @@ namespace Tweetbook.Services
             var response = await _cosmosStore.UpdateAsync(newPost);
             return response.IsSuccess;
         }
+
+        public Task<bool> UserOwnsPostAsync(long postId, string getUserId)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
 using System.Text;
 using Tweetbook.Options;
 using Tweetbook.Services;
@@ -41,23 +39,6 @@ namespace Tweetbook.Installers
                 });
 
             services.AddControllers();
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "TweetBook API", Version = "v1" });
-                var security = new Dictionary<string, IEnumerable<string>>
-                {
-                    { "Bearer", new string[0] }
-                };
-
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Description = "JWT Authorization header using the beare scheme",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey
-                });
-            });
         }
     }
 }
