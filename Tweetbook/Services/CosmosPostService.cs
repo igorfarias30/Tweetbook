@@ -24,7 +24,6 @@ namespace Tweetbook.Services
 
             var response = await _cosmosStore.AddAsync(cosmosPost);
             return response.IsSuccess;
-
         }
 
         public async Task<bool> DeletePostAsync(long postId)
@@ -36,11 +35,10 @@ namespace Tweetbook.Services
         public async Task<Post> GetPostByIdAsync(long Id)
         {
             var response = await _cosmosStore.FindAsync(Id.ToString());
-
-            if (response == null)
-                return null;
-
-            return new Post { Id = long.Parse(response.Id), Name = response.Name };
+            
+            return response is null
+                ? null
+                : new Post { Id = long.Parse(response.Id), Name = response.Name };
         }
 
         public async Task<List<Post>> GetPostsAsync()

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ namespace Tweetbook
             using (var serviceScope = host.Services.CreateScope())
             {
                 var dbContext = serviceScope.ServiceProvider.GetRequiredService<DataContext>();
-                await dbContext.Database.MigrateAsync();
+                await dbContext.Database.EnsureCreatedAsync();
             }
 
             await host.RunAsync();

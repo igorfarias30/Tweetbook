@@ -12,7 +12,11 @@ namespace Tweetbook.Installers
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {
             var settings = configuration.GetSection("CosmosSettings");
-            var cosmosStoreSettings = new CosmosStoreSettings(settings["DatabaseName"], settings["AccountUri"], settings["AccountKey"], new ConnectionPolicy());
+            var cosmosStoreSettings = new CosmosStoreSettings(settings["DatabaseName"],
+                settings["AccountUri"],
+                settings["AccountKey"],
+                new ConnectionPolicy {ConnectionMode = ConnectionMode.Direct, ConnectionProtocol = Protocol.Tcp}
+            );
 
             services.AddCosmosStore<CosmosPostDto>(cosmosStoreSettings);
         }
