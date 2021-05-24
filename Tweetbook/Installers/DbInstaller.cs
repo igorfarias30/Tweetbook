@@ -15,15 +15,15 @@ namespace Tweetbook.Installers
             {
                 var defaultConnection = configuration.GetSection("ConnectionStrings");
                 var connectionString = defaultConnection["DefaultConnection"] ?? "Test";
-                //options.UseSqlServer(connectionString);
+                options.UseSqlServer(connectionString);
 
-                options.UseInMemoryDatabase(connectionString);
+                //options.UseInMemoryDatabase(connectionString);
             });
 
             services.AddIdentityCore<IdentityUser>().AddEntityFrameworkStores<DataContext>();
 
             services.AddScoped<IPostService, PostService>();
-            services.AddSingleton<IPostService, CosmosPostService>();
+            //services.AddSingleton<IPostService, CosmosPostService>();
         }
     }
 }
